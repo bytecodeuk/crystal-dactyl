@@ -3,7 +3,8 @@
 
 .repl-*
 .nrepl-*
-
+repl-port
 .lein-*
 
 /target
+*.scad
