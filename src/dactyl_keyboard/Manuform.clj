@@ -16,6 +16,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@
+;;;;;;;;;random;;;;;;;;;;		
+;@@@@@@@@@@-@@@@@@@@@@@@@@@@
+;;;0= box 1=cherry 2= Alps
+(def switch-type 0)
+
+(def nrows 5)
+(def ncols 6)
+
+;@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;Wrist rest;;;;;;;;;;		
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@
 (def wrist-rest-on 1) 						;;0 for no rest 1 for a rest connection cut out in bottom case		
@@ -37,17 +46,6 @@
 ;;;;;;;;;bottom cover;;;;;;;;;;		
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@
 (def bottom-cover 1)						;;0= no cover  	1=cover 
-
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;;;;;;;;;random;;;;;;;;;;		
-;@@@@@@@@@@-@@@@@@@@@@@@@@@@
-;;;0= box 1=cherry 2= Alps
-(def switch-type 0)
-
-(def nrows 5)
-(def ncols 6)
-
 
 										;;dfefault 1
 
@@ -1259,15 +1257,15 @@
                    (translate [0 0 -20] (cube 350 350 40)) 
                   ))
 
-(spit "things/right.scad"
+(spit "things/crystalform-right.scad"
       (write-scad model-right))
  
-(spit "things/left.scad"
+(spit "things/crystalform-left.scad"
       (write-scad (mirror [-1 0 0] model-right)))
 	  
 
                   
-(spit "things/right-test.scad"
+(spit "things/crystalform-right-test.scad"
    (write-scad
 		(difference
                    (union
@@ -1337,50 +1335,50 @@
 )		  
 			
 			
-(spit "things/sample.scad"
-      (write-scad 
-		(union
-			model-right
-			caps
-			thumbcaps
-			;(if (== bottom-cover 1) (->> model-plate-right))
-			(if (== wrist-rest-on 1) (->> wrist-rest-build 		)		)
+; (spit "things/crystalform-presentation.scad"
+;       (write-scad 
+; 		(union
+; 			model-right
+; 			caps
+; 			thumbcaps
+; 			;(if (== bottom-cover 1) (->> model-plate-right))
+; 			(if (== wrist-rest-on 1) (->> wrist-rest-build 		)		)
 			
-		))
-)		
+; 		))
+; )		
 	  
 
 
 	  
-(spit "things/right-plate.scad"
+(spit "things/crystalform-right-plate.scad"
       (write-scad model-plate-right))
 
 	  
-(spit "things/wrist-rest.scad"
+(spit "things/crystalform-wrist-rest.scad"
       (write-scad wrist-rest-build))	  
 	  
 	
 	  
 	  
 	  
-(spit "things/test.scad"
-      (write-scad
-		(union
-		#_	(difference
-					(union
-						;(if (== wrist-rest-on 1) (->> wrist-rest-build 		)		);;add/remove the wrist rest holes
-						case-walls
-						screw-insert-outers	
-					)
-						;screw-insert-outers 
-					;	screw-insert-outers
-						(translate [0 0 -5] screw-insert-screw-holes)
-						cut-bottom
+; (spit "things/crystaltest.scad"
+;       (write-scad
+; 		(union
+; 		#_	(difference
+; 					(union
+; 						;(if (== wrist-rest-on 1) (->> wrist-rest-build 		)		);;add/remove the wrist rest holes
+; 						case-walls
+; 						screw-insert-outers	
+; 					)
+; 						;screw-insert-outers 
+; 					;	screw-insert-outers
+; 						(translate [0 0 -5] screw-insert-screw-holes)
+; 						cut-bottom
 						
-				)
-			case-wall-cutout
-			)
-	  ))
+; 				)
+; 			case-wall-cutout
+; 			)
+; 	  ))
       ;   (difference usb-holder usb-holder-hole)))
 
 
