@@ -1,7 +1,12 @@
-# Crystalhand's Dactyl
+# Revised Version of Crystalhand's Dactyl (Hactyl)
 This is my version of the Dactyl with a number of modifications and additions.  I changed a number of constants to variables to make it easier to modify.
 
-
+Customization for Hactyl (Derek changes)
+- Hotswap holder i designed (hotglue recommended)
+- North switch orientation support
+- Cutout for tiny little teeth in front and back of many switchs
+- Renamed, commented, and cleaned up some of the code to make more readable
+- Added pre-rendered STL files, and ZIP files for SCAD that generated the STL files.
 
 Customization for dactyl
 - Ergodox like layout for a wider range of supported keys
