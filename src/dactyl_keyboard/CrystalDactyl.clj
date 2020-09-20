@@ -35,20 +35,20 @@
 ;;;;;General ;;;;;;;;;;;;;		
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@
 (def row-size 0)							;;0 for dactyl, 1 for lightcycle-  MAKE SURE alpha_ergo_style is 0 for lightcycle
-(def switch-type 1)							;;;0= box 1=cherry 2= Alps		-88
+(def switch-type 3)							;;;0= box, 1=cherry, 2= Alps, 3=hotswapbox 
 (def bottom-side-width 1.2) 					;Default 1.2  Originally 1 ;;Width of the bottom sides
 (def top-case-thickness 1.25)					;Default 1.25  Originally 1
 (def sidewall-height 10)						;;;;controls height of sidewalls on top.  low profile Defaults 5-lightcycle 	10-dactyl	high profile
 (def top-z-offset 0)						;;;Controls the z/height offset of the case.  Default is 0 higher raises the case (dont forget to compensate the screw mounts)
 (def top-z-offset-thumb 0)					;;Controls thumb offset.  Generally speaking should be the same as the z offset	default 0
-(def case-text '"")
+(def case-text '"crystactyl")
 ;(def case-text '"https://redd.it/9bd8ip")
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;Alpha area curve;;;;;;;;;;		
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@
-(def front-back-curve (deg2rad 15))					;;Default is 15 front to back curve of alpha area.
+(def front-back-curve (deg2rad 15))					;;Default is 15 fnront to back curve of alpha area.
 (def left-right-curve (deg2rad 5))					;;Default is 5 left-right curve of alpha area.  
 (def alphas-column-extra-width 2.0)					;;default 2 the width between each key.
 (def alphas-row-extra-width 0.5)					;;default .5.  width between keys between rows
@@ -125,7 +125,7 @@
 (def keyswitch-width 14.65);Nub side original 14.5 last 14.8----14.65 works for both.  box slightly loose
 
 (def cherry-keyswitch-height 14.4) ;; Was 14.1, then 14.25
-(def cherry-keyswitch-width 14.4)
+(def cherry-keyswitch-width 14.4) ;; TODO derek why was this increased????
 
 (def alps-keyswitch-height 12.9) ;; Was 14.1, then 14.25
 (def alps-keyswitch-width 15.5)
@@ -135,11 +135,152 @@
 (def alps-height 12.85)
 
 
-(def sa-profile-key-height 12.7)
+(def sa-profile-key-height 12.7) ; TODO-derek reduce to 12? and observe changes to screw hole positions
 
-(def plate-thickness 4)
+(def plate-thickness 5) ;; default 4 to be slightly thicker than case, 5 for hotswap
 (def mount-width (+ keyswitch-width 3))
 (def mount-height (+ keyswitch-height 3))
+
+(def web-thickness plate-thickness) ;; magic number of 3.5, changed to match plate thickness for easier printing
+(def holder-x mount-width)
+(def holder-thickness    (/ (- holder-x keyswitch-width) 2))
+(def holder-y            (+ keyswitch-height (* holder-thickness 2)))
+
+(def use-hotswap true)
+(def north-facing true)
+(def mirror-internals-for-left false) ;false=right hotswap, true=left hotswap TODO derek lazy way to create left and right with correct hot swap holes
+(def hotswap-holder
+  (let [
+        ; irregularly shaped hot swap holder
+        ; ___________
+        ;|___________|  hotswap offset from out edge of holder
+        ;|_|_O__  \  |  hotswap pin
+        ;|      \O_|_|  hotswap pin
+        ;|  o  O  o  |  fully supported friction holes
+        ;| _________ |   
+        ;||_________||  space for LED  
+        ;
+        ; can be be described as having two sizes in the y dimension depending on the x coordinate        
+        swap-x              holder-x
+        swap-y              11.5 ; should be less than or equal to holder-y
+        swap-z-calc         (-  web-thickness plate-thickness)
+        swap-z              3; (if (> swap-z-calc 1) swap-z-calc 3)
+        swap-offset-x       0
+        swap-offset-y       (/ (- holder-y swap-y) 2)
+        swap-offset-z       (* (/ swap-z 2) -1) ; the bottom of the hole. 
+        swap-holder         (->> (cube swap-x swap-y swap-z)
+                                 (translate [swap-offset-x 
+                                             swap-offset-y
+                                             swap-offset-z]))
+        hotswap-x           holder-x
+        hotswap-x2          (* (/ holder-x 3) 1.95)
+        hotswap-y1          4.3
+        hotswap-y2          6.2
+        hotswap-z           3.5
+        hotswap-cutout-1-x-offset 0.01
+        hotswap-cutout-2-x-offset (* (/ holder-x 4.5) -1)
+        hotswap-cutout-1-y-offset 4.95
+        hotswap-cutout-2-y-offset 4
+        hotswap-cutout-z-offset -2.6
+        hotswap-cutout-1    (->> (cube hotswap-x hotswap-y1 hotswap-z)
+                                 (translate [hotswap-cutout-1-x-offset 
+                                             hotswap-cutout-1-y-offset 
+                                             hotswap-cutout-z-offset]))
+        hotswap-cutout-2    (->> (cube hotswap-x2 hotswap-y2 hotswap-z)
+                                 (translate [hotswap-cutout-2-x-offset 
+                                             hotswap-cutout-2-y-offset 
+                                             hotswap-cutout-z-offset]))
+
+        ; for the main axis
+        main-axis-hole      (->> (cylinder (/ 4.1 2) 10)
+                                 (with-fn 12))
+        plus-hole           (->> (cylinder (/ 3.3 2) 10)
+                                 (with-fn 8)
+                                 (translate [-3.81 2.54 0]))
+        minus-hole          (->> (cylinder (/ 3.3 2) 10)
+                                 (with-fn 8)
+                                 (translate [2.54 5.08 0]))
+        friction-hole       (->> (cylinder (/ 1.95 2) 10)
+                                 (with-fn 8))
+        friction-hole-right (translate [5 0 0] friction-hole)
+        friction-hole-left  (translate [-5 0 0] friction-hole)
+       ]
+      (difference swap-holder
+                  main-axis-hole
+                  plus-hole
+                  minus-hole
+                  friction-hole-left
+                  friction-hole-right
+                  hotswap-cutout-1
+                  hotswap-cutout-2)
+  )
+)
+
+(def switch-teeth-cutout
+  (let [
+        ; cherry, gateron, kailh switches all have a pair of tiny "teeth" that stick out
+        ; on the top and bottom, this gives those teeth somewhere to press into
+        teeth-x        4.5
+        teeth-y        0.75
+        teeth-z        1.75
+        teeth-x-offset 0
+        teeth-y-offset (+ (/ keyswitch-height 2) (/ teeth-y 2.01))
+        teeth-z-offset (- plate-thickness 1.95)
+       ]
+      (->> (cube teeth-x teeth-y teeth-z)
+           (translate [teeth-x-offset teeth-y-offset teeth-z-offset])
+      )
+  )
+)
+
+;derek's kalih box compatible with hot-swap and north led support
+(def box-hotswap-plate
+  (let [top-wall (->> (cube (+ keyswitch-width 3) 1.5 plate-thickness)
+                      (translate [0
+                                  (+ (/ 1.5 2) (/ keyswitch-height 2))
+                                  (/ plate-thickness 2)]))
+        left-wall (->> (cube 1.5 (+ keyswitch-height 3) plate-thickness)
+                       (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
+                                   0
+                                   (/ plate-thickness 2)]))
+       ; side-nub (->> (binding [*fn* 30] (cube 0.7 0.85 8.75));last number is nub size.  4.75 works for box
+       ;                (rotate (/ π 2) [1 0 0])
+       ;                (translate [(+ (/ keyswitch-width 2)) 0 3.1]) ;last number control nub height
+       ;                (hull (->> (cube 1.5 2.75 1)
+       ;                           (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
+       ;                                       0
+       ;                                       (/ plate-thickness 1.15)])))
+							; 				 );2nd number controls slant height position
+       ;  plate-half (union top-wall left-wall (with-fn 100 side-nub))]
+       plate-half (difference (union top-wall left-wall)
+                              switch-teeth-cutout
+                  ) 
+    ; (union plate-half
+    ;        (->> plate-half
+    ;             (mirror [1 0 0])
+    ;             (mirror [0 1 0])))))
+        plate (difference (union plate-half
+                                 (->> plate-half
+                                      (mirror [1 0 0])
+                                      (mirror [0 1 0]))
+                                 (if use-hotswap
+                                       (if north-facing
+                                           (->> hotswap-holder
+                                                (mirror [1 0 0])
+                                                (mirror [0 1 0])
+                                           )
+                                           hotswap-holder
+                                       )
+                                     ()
+                                  )))
+       ]
+       (->> (if mirror-internals-for-left
+                (->> plate (mirror [1 0 0]))
+                plate
+            )
+       )
+  )
+)
 
 ;kalih box
 (def box-single-plate
@@ -250,8 +391,9 @@
 				
 (def single-plate
 		(if (== switch-type 0) box-single-plate 
-		(if (== switch-type 1) cherry-single-plate 
-		(if (== switch-type 2) Matias-single-plate )))
+			(if (== switch-type 1) cherry-single-plate 
+				(if (== switch-type 2) Matias-single-plate 
+					(if (== switch-type 3) box-hotswap-plate ))))
 	)
 
 ;;;;;;;;;;;;;;;;
@@ -431,7 +573,6 @@
 ;; Web Connectors ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(def web-thickness 3.5)
 (def post-size 0.1)
 (def web-post (->> (cube post-size post-size web-thickness)
                    (translate [0 0 (+ (/ web-thickness -2)
@@ -1075,7 +1216,9 @@
                     (top-case-cover place wall-sphere-top-front
                                     x-start x-end y-start y-end
                                     wall-step))]
-    (union
+   (union
+
+    ;; VERTICAL_PART_OF_WALL
      (apply union		;;Front left top case wall
             (for [x (range-inclusive 0.7 (- right-wall-column step) step)]
               (hull (place x 4 wall-sphere-top-front)
@@ -1087,9 +1230,12 @@
               (hull (place x 4 wall-sphere-top-front)
                     (place (+ x step) 4 wall-sphere-top-front)
                     (place 0.7 4 wall-sphere-bottom-front))))
-     (top-cover 0.5 1.7 3.6 4)
-     (top-cover 1.59 2.41 3.42 4) ;; was 3.32@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-     (top-cover 2.39 3.41 3.6 4)
+
+     ; OVERHANGS_ATTACHED_TO_TOP_OF_WALL
+     ; (top-cover 0.5 1.7 3.6 4)
+     ; (top-cover 1.59 2.41 3.42 4) ;; was 3.32@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+     ; (top-cover 2.39 3.41 3.6 4)
+
 	 (if (= alpha_ergo_style 1)
 		(top-cover 5.59 6.00 3.0 4))
      (apply union
@@ -1113,7 +1259,10 @@
      (hull (place 0.7 4 (translate [0 1 1] wall-sphere-bottom-front))
            (place 1.7 4 (translate [0 1 1] wall-sphere-bottom-front))
            (key-place 1 4 web-post-bl)
-           (key-place 1 4 web-post-br)))))
+           (key-place 1 4 web-post-br))
+   )
+  )
+)
 
 (def back-wall
   (let [back-row (first rows)
@@ -1128,18 +1277,22 @@
                                          (place (+ x wall-sphere-top-backtep) y wall-sphere-top-back)
                                          (place x (+ y wall-sphere-top-backtep) wall-sphere-top-back)
                                          (place (+ x wall-sphere-top-backtep) (+ y wall-sphere-top-backtep) wall-sphere-top-back)))))]
-    (union
+   (union
+
+    ;; VERTICAL_PART_OF_WALL
      (apply union
             (for [x (range-inclusive left-wall-column (- right-wall-column step) step)]
               (hull (place x back-y wall-sphere-top-back)
                     (place (+ x step) back-y wall-sphere-top-back)
                     (place x back-y wall-sphere-bottom-back)
                     (place (+ x step) back-y wall-sphere-bottom-back))))
-     (front-top-cover left-wall-column 1.56 back-y (+ back-y 0.06));;The following 3 control back overhang
-     (front-top-cover left-wall-column right-wall-column back-y (+ back-y 0.15)); left 4 columns overhang-- was 2.4  but had issues with alps and lightcycle
+
+     ; OVERHANGS_ATTACHED_TO_TOP_OF_WALL
+     ; (front-top-cover left-wall-column 1.56 back-y (+ back-y 0.06));;The following 3 control back overhang
+     ; (front-top-cover left-wall-column right-wall-column back-y (+ back-y 0.15)); left 4 columns overhang-- was 2.4  but had issues with alps and lightcycle
      ;(front-top-cover 1.56 2.44 back-y (+ back-y 0.24));middle finger column
-     (front-top-cover 3.56 4.44 back-y (+ back-y 0.32));2nd from right overhand
-     (front-top-cover 4.3 right-wall-column back-y (+ back-y 0.32))	;;Edge most column
+     ; (front-top-cover 3.56 4.44 back-y (+ back-y 0.32));2nd from right overhand
+     ; (front-top-cover 4.3 right-wall-column back-y (+ back-y 0.32))	;;Edge most column
 
 
      (hull (place left-wall-column back-y (translate [1 -1 1] wall-sphere-bottom-back))
@@ -1150,8 +1303,8 @@
      (hull (place 5 back-y (translate [0 -1 1] wall-sphere-bottom-back)) ;;This is the rightmost section of the back
            (place right-wall-column back-y (translate [0 -1 1] wall-sphere-bottom-back))
            (key-place 5 back-row web-post-tl)
-          (if (== alpha_ergo_style 1) (key-place 5 back-row (translate[5 0 0] web-post-tr )))
-		  (if (== alpha_ergo_style 0) (key-place 5 back-row web-post-tr ))
+           (if (== alpha_ergo_style 1) (key-place 5 back-row (translate[5 0 0] web-post-tr )))
+		         (if (== alpha_ergo_style 0) (key-place 5 back-row web-post-tr ))
 		   )
 
      (apply union
@@ -1167,11 +1320,16 @@
     (hull (place (- 5 1/2) back-y (translate [0 -1 1] wall-sphere-bottom-back))
            (place 5 back-y (translate [0 -1 1] wall-sphere-bottom-back))
            (key-place 4 back-row web-post-tr)
-           (key-place 5 back-row web-post-tl)))))
+           (key-place 5 back-row web-post-tl))
+   )
+  )
+)
 
 (def right-wall
   (let [place case-place]
-    (union
+   (union
+
+    ;; VERTICAL_PART_OF_WALL
      (apply union
             (map (partial apply hull)
                  (partition 2 1
@@ -1199,17 +1357,23 @@
                      (key-place 5 (first rows) web-post-tr))
                (hull (place right-wall-column 4 (translate [-1 0 1] (wall-sphere-bottom 1/2)))
                      (place right-wall-column 4 (translate [-1 1 1] (wall-sphere-bottom 0)))
-                     (key-place 5 4 web-post-br)))])))))
+                     (key-place 5 4 web-post-br)))]))
+   )
+  )
+)
 					 
 (def left-wall-dactyl	
 	(let [place case-place]
-    (union
+   (union
+
+    ;; VERTICAL_PART_OF_WALL
      (apply union
             (for [x (range-inclusive (dec (first rows)) (- 1.6666 wall-step) wall-step)]
               (hull (place left-wall-column x wall-sphere-top-front)
                     (place left-wall-column (+ x wall-step) wall-sphere-top-front)
                     (place left-wall-column x wall-sphere-bottom-front)
                     (place left-wall-column (+ x wall-step) wall-sphere-bottom-front))))
+
      (hull (place left-wall-column (dec (first rows)) wall-sphere-top-front)
            (place left-wall-column (dec (first rows)) wall-sphere-bottom-front)
            (place left-wall-column back-y wall-sphere-top-back)
@@ -1234,18 +1398,24 @@
            (key-place 0 3 web-post-tl))
      (hull (place left-wall-column 1.6666 (translate [1 0 1] wall-sphere-bottom-front))
            (thumb-place 1 1 web-post-tr)
-           (thumb-place 1/2 thumb-back-y (translate [0 -1 1] wall-sphere-bottom-back))))))
+           (thumb-place 1/2 thumb-back-y (translate [0 -1 1] wall-sphere-bottom-back)))
+   )
+ )
+)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;needs modification
 (def left-wall-lightcycle
   (let [place case-place]
-    (union
+   (union
+
+    ;; VERTICAL_PART_OF_WALL
      (apply union
             (for [x (range-inclusive (dec (first rows)) (- 1.6666 wall-step) wall-step)]
               (hull (place left-wall-column x wall-sphere-top-front)
                     (place left-wall-column (+ x wall-step) wall-sphere-top-front)
                     (place left-wall-column x wall-sphere-bottom-front)
                     (place left-wall-column (+ x wall-step) wall-sphere-bottom-front))))
+
      (hull (place left-wall-column (dec (first rows)) wall-sphere-top-front)
            (place left-wall-column (dec (first rows)) wall-sphere-bottom-front)
            (place left-wall-column back-y wall-sphere-top-back)
@@ -1272,7 +1442,10 @@
            (key-place 0 3 web-post-tl))
      (hull (place left-wall-column 1.6666 (translate [1 0 1] wall-sphere-bottom-front))
            (thumb-place 1 1 web-post-tr)
-           (thumb-place 1/2 thumb-back-y (translate [0 -1 1] wall-sphere-bottom-back))))))
+           (thumb-place 1/2 thumb-back-y (translate [0 -1 1] wall-sphere-bottom-back)))
+   )
+  )
+)
 
 (def thumb-back-wall
   (let [step wall-step
@@ -1286,13 +1459,16 @@
                                          (thumb-place x (+ y top-step) wall-sphere-top-back)
                                          (thumb-place (+ x top-step) (+ y top-step) wall-sphere-top-back)))))
         back-y thumb-back-y]
-    (union
+   (union
+
+    ;; VERTICAL_PART_OF_WALL
      (apply union
             (for [x (range-inclusive 1/2 (- (+ 5/2 0.05) step) step)]
               (hull (thumb-place x back-y wall-sphere-top-back)
                     (thumb-place (+ x step) back-y wall-sphere-top-back)
                     (thumb-place x back-y wall-sphere-bottom-back)
                     (thumb-place (+ x step) back-y wall-sphere-bottom-back))))
+
      (hull (thumb-place 1/2 back-y wall-sphere-top-back)
            (thumb-place 1/2 back-y wall-sphere-bottom-back)
            (case-place left-wall-column 1.6666 wall-sphere-top-front))
@@ -1308,18 +1484,24 @@
       (thumb-place (+ 5/2 0.05) thumb-back-y (translate [1 -1 1] wall-sphere-bottom-back))
       (thumb-place 3/2 thumb-back-y (translate [0 -1 1] wall-sphere-bottom-back))
       (thumb-place 1 1 web-post-tl)
-      (thumb-place 2 1 web-post-tl)))))
+      (thumb-place 2 1 web-post-tl))
+   )
+  )
+)
 
 (def thumb-left-wall
   (let [step wall-step
         place thumb-place]
    (union
+
+    ;; VERTICAL_PART_OF_WALL
      (apply union
             (for [x (range-inclusive (+ -1 0.07) (- 1.95 step) step)]
               (hull (place thumb-left-wall-column x wall-sphere-top-front)
                     (place thumb-left-wall-column (+ x step) wall-sphere-top-front)
                     (place thumb-left-wall-column x wall-sphere-bottom-front)
                     (place thumb-left-wall-column (+ x step) wall-sphere-bottom-front))))
+
     (hull (place thumb-left-wall-column 1.95 wall-sphere-top-front)
            (place thumb-left-wall-column 1.95 wall-sphere-bottom-front)
            (place thumb-left-wall-column thumb-back-y wall-sphere-top-back)
@@ -1347,7 +1529,10 @@
       (thumb-place thumb-left-wall-column -1 (translate [1 0 1] wall-sphere-bottom-back))
       (thumb-place thumb-left-wall-column (+ -1 0.07) (translate [1 1 1] wall-sphere-bottom-front))
       (thumb-place 2 -1 web-post-tl)
-      (thumb-place 2 -1 web-post-bl)))))
+      (thumb-place 2 -1 web-post-bl))
+   )
+  )
+)
 
 (def thumb-front-wall
   (let [step wall-step ;;0.1
@@ -1362,14 +1547,17 @@
                       (translate [-0 plate-height 0]))
         thumb-br (->> web-post-br
                       (translate [-0 (- plate-height) 0]))]
-    (union
-     (apply union
+   (union
+
+    ;; VERTICAL_PART_OF_WALL
+    (apply union
             (for [x (range-inclusive thumb-right-wall (- (+ 5/2 0.05) step) step)]
               (hull (place x thumb-front-row wall-sphere-top-front)
                     (place (+ x step) thumb-front-row wall-sphere-top-front)
                     (place x thumb-front-row wall-sphere-bottom-front)
                     (place (+ x step) thumb-front-row wall-sphere-bottom-front))))
-(if ( > left-right-thumb-tilt -30)(->> 
+
+    (if ( > left-right-thumb-tilt -30)(->> 
      (hull (place thumb-right-wall thumb-front-row wall-sphere-top-front)
            (place thumb-right-wall thumb-front-row wall-sphere-bottom-front)
            (case-place 0.5 4 wall-sphere-top-front))
@@ -1397,7 +1585,10 @@
            (place 0 -1/2 thumb-bl)
            (place 1 -1/2 thumb-bl)
            (place 1 -1/2 thumb-br)
-           (place 2 -1 web-post-br)))))
+           (place 2 -1 web-post-br))
+   )
+  )
+)
 
 (def new-case
   (union front-wall
@@ -2478,6 +2669,8 @@
 )
 
 
+  (spit "things/Dactyl-top-left.scad"
+        (write-scad dactyl-top-left))
 
   (spit "things/Dactyl-top-right.scad"
         (write-scad dactyl-top-right))
@@ -2487,18 +2680,17 @@
 		
   (spit "things/Dactyl-bottom-left.scad"
         (write-scad dactyl-bottom-left))		
-		
-	(spit "things/side-sample.scad"
-        (write-scad side-sample))
-	
-  (spit "things/Dactyl-top-left.scad"
-        (write-scad dactyl-top-left))
 
   (spit "things/Dactyl-wrist-rest-right.scad"
-      (write-scad dactyl-wrist-rest-right))
+      (write-scad dactyl-wrist-rest-right)) 
 
-(spit "things/pro-micro-trrs-mounts.scad"
-    (write-scad pro-micro-trrs-mounts))
+
+  	; (spit "things/presentation.scad"
+   ;      (write-scad side-sample))
+
+
+; (spit "things/pro-micro-trrs-mounts.scad"
+;     (write-scad pro-micro-trrs-mounts))
 
 ;(spit "things/lightcycle-matias-bottom-right.scad"
 ;      (write-scad dactyl-bottom-right))
