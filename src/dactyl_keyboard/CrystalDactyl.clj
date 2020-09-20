@@ -191,8 +191,7 @@
                                              hotswap-cutout-2-y-offset 
                                              hotswap-cutout-z-offset]))
 
-        ; for the main axis
-        main-axis-hole      (->> (cylinder (/ 4.1 2) 10)
+        center-hole      (->> (cylinder (/ 4.1 2) 10)
                                  (with-fn 12))
         plus-hole           (->> (cylinder (/ 3.3 2) 10)
                                  (with-fn 8)
@@ -206,7 +205,7 @@
         friction-hole-left  (translate [-5 0 0] friction-hole)
        ]
       (difference swap-holder
-                  main-axis-hole
+                  center-hole
                   plus-hole
                   minus-hole
                   friction-hole-left
@@ -243,22 +242,9 @@
                        (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
                                    0
                                    (/ plate-thickness 2)]))
-       ; side-nub (->> (binding [*fn* 30] (cube 0.7 0.85 8.75));last number is nub size.  4.75 works for box
-       ;                (rotate (/ π 2) [1 0 0])
-       ;                (translate [(+ (/ keyswitch-width 2)) 0 3.1]) ;last number control nub height
-       ;                (hull (->> (cube 1.5 2.75 1)
-       ;                           (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
-       ;                                       0
-       ;                                       (/ plate-thickness 1.15)])))
-							; 				 );2nd number controls slant height position
-       ;  plate-half (union top-wall left-wall (with-fn 100 side-nub))]
-       plate-half (difference (union top-wall left-wall)
-                              switch-teeth-cutout
+        plate-half (difference (union top-wall left-wall)
+                               switch-teeth-cutout
                   ) 
-    ; (union plate-half
-    ;        (->> plate-half
-    ;             (mirror [1 0 0])
-    ;             (mirror [0 1 0])))))
         plate (difference (union plate-half
                                  (->> plate-half
                                       (mirror [1 0 0])
