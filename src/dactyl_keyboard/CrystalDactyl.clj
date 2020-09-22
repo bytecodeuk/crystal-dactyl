@@ -1099,35 +1099,39 @@
 
 (def thumb-lightcycle
 	(union
-	   thumb-connectors
-	   
-	   
-	    (if (> switch-type 1) (thumb-layout (rotate (/ π 2) [0 0 1] single-plate)))
+		thumb-connectors
+		(if (> switch-type 1) (thumb-layout (rotate (/ π 2) [0 0 1] single-plate)))
 		(if (< switch-type 2)(thumb-layout (rotate (/ π 1) [0 0 1] single-plate)))
-	   ))
+	)
+)
 (def thumb-1u 
 	(union
-	   thumb-connectors-1u
-	   (thumb-layout-1u (rotate (/ π 1) [0 0 1] single-plate))
-	   ))
+		thumb-connectors-1u
+		(thumb-layout-1u (rotate (/ π 1) [0 0 1] single-plate))
+	)
+)
 (def thumb-2u 
 	(union
-	   thumb-connectors-2u
-		(thumb-layout-2u (rotate (/ π 1) [0 0 1] single-plate))
+		thumb-connectors-2u
+		(thumb-layout-2u single-plate) ;(thumb-layout-2u (rotate (/ π 1) [0 0 1] single-plate))
 		(thumb-place 0 -1/2 double-plates)
 		(thumb-place 1 -1/2 double-plates)
-	   ))	   		
+	)
+)
 (def thumb
 		(if (== thumb-type 0) thumb-lightcycle
-		(if (== thumb-type 1) thumb-1u  
-		(if (== thumb-type 2) thumb-2u  )))
-  )
- (def thumbcaps
+			(if (== thumb-type 1) thumb-1u  
+				(if (== thumb-type 2) thumb-2u  )
+			)
+		)
+)
+(def thumbcaps
 		(if (== thumb-type 0) thumbcaps-lightcycle
-		(if (== thumb-type 1) thumbcaps-1u  
-		(if (== thumb-type 2) thumbcaps-2u  )))
-  )
-
+			(if (== thumb-type 1) thumbcaps-1u  
+				(if (== thumb-type 2) thumbcaps-2u  )
+			)
+		)
+)
 
 
 ;;;;;;;;;;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
