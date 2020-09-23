@@ -41,7 +41,7 @@
 (def sidewall-height 10)						;;;;controls height of sidewalls on top.  low profile Defaults 5-lightcycle 	10-dactyl	high profile
 (def top-z-offset 0)						;;;Controls the z/height offset of the case.  Default is 0 higher raises the case (dont forget to compensate the screw mounts)
 (def top-z-offset-thumb 0)					;;Controls thumb offset.  Generally speaking should be the same as the z offset	default 0
-(def case-text '"crystactyl")
+(def case-text '"Hactyl")
 ;(def case-text '"https://redd.it/9bd8ip")
 
 
@@ -2058,14 +2058,14 @@
 
 (def screw-mounts-square2 (->>
 		(if (< left-right-thumb-tilt -5) 
-			(->>(cube 10 10 50)
+			(->>(cube 10 10 40)
 			(translate [0 0 30.])
 			(rotate (/ (* π (/ left-right-thumb-tilt 4)) 180) [0 1 0])
 			(rotate (/ π 0.9) [1 0 0 ])
 		)
 		
 		(if (> left-right-thumb-tilt -5) (->> 	
-			(cube 10 10 50)
+			(cube 10 10 40)
 			(translate [0 0 26])		
 			(rotate (/ π 10) [0 1 0])
 			(rotate (/ π 1.05) [1 0 0 ])
@@ -2231,7 +2231,7 @@
 			(if (> thumb-type 0) (thumb-place 3/2 -1/2  heat-set-cutout2)		)
 			(if (== thumb-type 0) (thumb-place  1.65 -0.2   heat-set-cutout2)	)
 		)
-		(cube 200 200 3.5)
+		;(cube 200 500 3.5) ;;what do you do??
 	)
 
 )
@@ -2659,19 +2659,19 @@
 )
 
 
-  (spit "things/Dactyl-top-left.scad"
+  (spit "things/Hactyl-top-left.scad"
         (write-scad dactyl-top-left))
 
-  (spit "things/Dactyl-top-right.scad"
+  (spit "things/Hactyl-top-right.scad"
         (write-scad dactyl-top-right))
 
-  (spit "things/Dactyl-bottom-right.scad"
+  (spit "things/Hactyl-bottom-right.scad"
         (write-scad dactyl-bottom-right))
 		
-  (spit "things/Dactyl-bottom-left.scad"
+  (spit "things/Hactyl-bottom-left.scad"
         (write-scad dactyl-bottom-left))		
 
-  (spit "things/Dactyl-wrist-rest-right.scad"
+  (spit "things/Hactyl-wrist-rest-right.scad"
       (write-scad dactyl-wrist-rest-right)) 
 
 
