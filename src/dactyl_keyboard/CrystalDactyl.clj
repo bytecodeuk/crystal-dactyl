@@ -74,12 +74,12 @@
 ;;;;;;;;;Wrist rest;;;;;;;;;;		
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@
 (def wrist-rest-on 1) 							;;0 for no rest 1 for a rest connection cut out in bottom case	
-(def wrist-rest-back-height 46)					;;Default 46 height of the back of the wrist rest
+(def wrist-rest-back-height 40)					;;Default 46 height of the back of the wrist rest
 (def wrist-rest-angle 10) 						;;Default 20 angle of the wrist rest
 (def wrist-rest-rotation-angle 0)				;;Default 9 The angle in counter clockwise the wrist rest is at			
 (def wrist-rest-ledge 4)						;;Default 4 The height of ledge the silicone wrist rest fits inside
 (def rest-offset-x 0)							;; Default 0 offset of the wrist rest in the x direction
-(def rest-offset-y 10)							;; Default 0 (effectively shorftens or lengthens wrist rest connectors)
+(def rest-offset-y 5)							;; Default 0 (effectively shorftens or lengthens wrist rest connectors)
 (def wrist-rest-y-angle -10)						;;0 Default.  Controls the wrist rest y axis tilt (left to right)
 
 
