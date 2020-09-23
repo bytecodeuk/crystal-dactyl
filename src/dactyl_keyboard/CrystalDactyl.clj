@@ -2240,32 +2240,40 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;@@@@@@@@@@@@@@pro micro/trrs holder@@@@@@@@@@@@@@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def usb-holder-position [0 0 2])
-(def pro-micro-position [-0.5 (- 37 (* row-size 20)) 4])		;(def pro-micro-position [-18 16 4])
-(def usb-holder-size [18.7 31  5.5 ])
+(def usb-holder-position [0 0 2.5])
+(def pro-micro-position [-0.5 (- 37 (* row-size 20)) 0])		;(def pro-micro-position [-18 16 4])
+(def usb-holder-size [18.8 31  5.5])
 (def usb-hole-size [18.6 33.98  9.5])
 (def usb-hole-front [ 8.0 10.6 9.5])
 (def usb-hole-back [10.6 35.6 6])
 (def usb-holder-thickness 5.5)
 (def usb-holder
-    (->> (difference
-		(cube (+ (first usb-holder-size) usb-holder-thickness) (+ (second usb-holder-size) usb-holder-thickness) (+ (last usb-holder-size) usb-holder-thickness) )
-		(translate usb-holder-position)
-	; (cube 5 5 5)
-     ) (translate  pro-micro-position); (apply cube usb-hole-size))
-	))
+	(->> 
+		(difference
+			(cube (+ (first  usb-holder-size) usb-holder-thickness) 
+			      (+ (second usb-holder-size) usb-holder-thickness) 
+			      (+ (last   usb-holder-size) usb-holder-thickness) 
+			)(translate usb-holder-position)
+		)(translate  pro-micro-position); (apply cube usb-hole-size))
+	)
+)
+
 (def usb-holder-hole
-    (->>
+	(->>
 		(union
 			(->>(apply cube usb-hole-size)
-			 (translate [(+ (first pro-micro-position) 0) (second pro-micro-position) (/ (+ (last usb-holder-size) -1) 1)]))
-			 (->>(apply cube usb-hole-front)
-			 (translate [(+ (first pro-micro-position) 1) (- (second pro-micro-position) 18) (+ (/ (last usb-holder-size) 2) (last usb-holder-position)) ]))
-			 (->>(apply cube usb-hole-back)
-			 (translate [(- (first pro-micro-position ) 0) (+ (second pro-micro-position) 10) (+ (/ (last usb-holder-size) 2) 2)]))
-		 )
-		 (translate usb-holder-position)
-		 ))
+				(translate [(+ (first pro-micro-position) 0) (second pro-micro-position) (/ (+ (last usb-holder-size) -1) 1)])
+			)
+			(->>(apply cube usb-hole-front)
+				(translate [(+ (first pro-micro-position) 1) (- (second pro-micro-position) 18) (+ (/ (last usb-holder-size) 2) (last usb-holder-position)) ])
+			)
+			(->>(apply cube usb-hole-back)
+				(translate [(- (first pro-micro-position ) 0) (+ (second pro-micro-position) 10) (+ (/ (last usb-holder-size) 2) 1.5)])
+			)
+		)
+		(translate usb-holder-position)
+	)
+)
 	
 (def trrs-holder-position [-18.5 (- 47. (* row-size 20)) 5])
 (def trrs-holder-size [12 13.6 9.2 ])
