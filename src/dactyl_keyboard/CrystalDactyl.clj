@@ -143,7 +143,7 @@
 
 (def plate-thickness 5) ;; default 4 to be slightly thicker than case, 5 for hotswap
 (def swap-z          3) ; "thickness" hotswap holder that doesn't protrude through to underside of switch, can go lower, 2mm still grips the hot-swap holder, but it depends how good your 3d printer, filament, tuning, and support settings are
-(def web-thickness   (if use-hotswap (+ plate-thickness swap-z) plate-thickness) ;; magic number used to be 3.5
+(def web-thickness   (if use-hotswap (+ plate-thickness swap-z) plate-thickness)) ;; magic number used to be 3.5
 
 (def mount-width (+ keyswitch-width 3))
 (def mount-height (+ keyswitch-height 3))
@@ -257,7 +257,15 @@
                        (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
                                    0
                                    (/ plate-thickness 2)]))
-        plate-half (difference (union top-wall left-wall)
+        side-nub (->> (binding [*fn* 30] (cube 0.7 0.85 8.75));last number is nub size.  4.75 works for box
+               (rotate (/ π 2) [1 0 0])
+               (translate [(+ (/ keyswitch-width 2)) 0 3.1]) ;last number control nub height
+               (hull (->> (cube 1.5 2.75 1)
+                          (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
+                                      0
+                                      (/ plate-thickness 1.15)])))
+							 );2nd number controls slant height position
+        plate-half (difference (union top-wall left-wall (with-fn 100 side-nub))
                                switch-teeth-cutout
                   ) 
         plate (difference (union plate-half
@@ -2681,6 +2689,8 @@
 	)
 )
 
+  (spit "things/switch-plate.scad"
+      (write-scad single-plate))
 
   (spit "things/Hactyl-top-left.scad"
         (write-scad dactyl-top-left))
