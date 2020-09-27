@@ -143,7 +143,7 @@
 
 (def plate-thickness 5) ;; default 4 to be slightly thicker than case, 5 for hotswap
 (def swap-z          3) ; "thickness" hotswap holder that doesn't protrude through to underside of switch, can go lower, 2mm still grips the hot-swap holder, but it depends how good your 3d printer, filament, tuning, and support settings are
-(def web-thickness   (if use-hotswap (+ plate-thickness swap-z) plate-thickness)) ;; magic number used to be 3.5
+(def web-thickness   (if use-hotswap (+ plate-thickness swap-z) plate-thickness)) ;; 0.85 or swap-z, previous magic number used to be 3.5
 
 (def mount-width (+ keyswitch-width 3))
 (def mount-height (+ keyswitch-height 3))
@@ -156,12 +156,12 @@
   (let [
         ; irregularly shaped hot swap holder
         ; ___________
-        ;|___________|  hotswap offset from out edge of holder
+        ;| |_______| |  hotswap offset from out edge of holder with room to solder
         ;|_|_O__  \  |  hotswap pin
         ;|      \O_|_|  hotswap pin
         ;|  o  O  o  |  fully supported friction holes
         ;| _________ |   
-        ;||_________||  space for LED  
+        ;||_________||  space for LED under SMD or transparent switches
         ;
         ; can be be described as having two sizes in the y dimension depending on the x coordinate        
         swap-x              holder-x
