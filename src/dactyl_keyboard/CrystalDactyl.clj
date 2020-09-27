@@ -137,18 +137,21 @@
 
 (def sa-profile-key-height 12.7) ; TODO-derek reduce to 12? and observe changes to screw hole positions
 
+(def use-hotswap true)
+(def north-facing true)
+(def mirror-internals-for-left false) ;false=right hotswap, true=left hotswap TODO derek lazy way to create left and right with correct hot swap holes
+
 (def plate-thickness 5) ;; default 4 to be slightly thicker than case, 5 for hotswap
+(def swap-z          3) ; "thickness" hotswap holder that doesn't protrude through to underside of switch, can go lower, 2mm still grips the hot-swap holder, but it depends how good your 3d printer, filament, tuning, and support settings are
+(def web-thickness   (if use-hotswap (+ plate-thickness swap-z) plate-thickness) ;; magic number used to be 3.5
+
 (def mount-width (+ keyswitch-width 3))
 (def mount-height (+ keyswitch-height 3))
 
-(def web-thickness plate-thickness) ;; magic number of 3.5, changed to match plate thickness for easier printing
 (def holder-x mount-width)
 (def holder-thickness    (/ (- holder-x keyswitch-width) 2))
 (def holder-y            (+ keyswitch-height (* holder-thickness 2)))
 
-(def use-hotswap true)
-(def north-facing true)
-(def mirror-internals-for-left false) ;false=right hotswap, true=left hotswap TODO derek lazy way to create left and right with correct hot swap holes
 (def hotswap-holder
   (let [
         ; irregularly shaped hot swap holder
@@ -162,9 +165,7 @@
         ;
         ; can be be described as having two sizes in the y dimension depending on the x coordinate        
         swap-x              holder-x
-        swap-y              11.5 ; should be less than or equal to holder-y
-        swap-z-calc         (-  web-thickness plate-thickness)
-        swap-z              3; (if (> swap-z-calc 1) swap-z-calc 3)
+        swap-y              (if (> 11.5 holder-y) holder-y 11.5) ; should be less than or equal to holder-y
         swap-offset-x       0
         swap-offset-y       (/ (- holder-y swap-y) 2)
         swap-offset-z       (* (/ swap-z 2) -1) ; the bottom of the hole. 
@@ -174,13 +175,17 @@
                                              swap-offset-z]))
         hotswap-x           holder-x
         hotswap-x2          (* (/ holder-x 3) 1.95)
-        hotswap-y1          4.3
-        hotswap-y2          6.2
-        hotswap-z           3.5
+        hotswap-x3          (/ holder-x 4)
+        hotswap-y1          4.3 ;first y-size of kailh hotswap holder
+        hotswap-y2          6.2 ;second y-size of kailh hotswap holder
+        hotswap-z           (+ swap-z 0.5) ;thickness of kailn hotswap holder + some margin of printing error (0.5mm)
         hotswap-cutout-1-x-offset 0.01
         hotswap-cutout-2-x-offset (* (/ holder-x 4.5) -1)
+        hotswap-cutout-3-x-offset (- (/ holder-x 2)   (/ hotswap-x3 2))
+        hotswap-cutout-4-x-offset (- (/ hotswap-x3 2) (/ holder-x 2))
         hotswap-cutout-1-y-offset 4.95
         hotswap-cutout-2-y-offset 4
+        hotswap-cutout-3-y-offset (/ holder-y 2)
         hotswap-cutout-z-offset -2.6
         hotswap-cutout-1    (->> (cube hotswap-x hotswap-y1 hotswap-z)
                                  (translate [hotswap-cutout-1-x-offset 
@@ -190,6 +195,14 @@
                                  (translate [hotswap-cutout-2-x-offset 
                                              hotswap-cutout-2-y-offset 
                                              hotswap-cutout-z-offset]))
+        hotswap-cutout-3    (->> (cube hotswap-x3 hotswap-y1 hotswap-z)
+                                 (translate [ hotswap-cutout-3-x-offset
+                                              hotswap-cutout-3-y-offset
+                                              hotswap-cutout-z-offset]))
+        hotswap-cutout-4    (->> (cube hotswap-x3 hotswap-y1 hotswap-z)
+                                 (translate [ hotswap-cutout-4-x-offset
+                                              hotswap-cutout-3-y-offset
+                                              hotswap-cutout-z-offset]))
 
         center-hole      (->> (cylinder (/ 4.1 2) 10)
                                  (with-fn 12))
@@ -211,7 +224,9 @@
                   friction-hole-left
                   friction-hole-right
                   hotswap-cutout-1
-                  hotswap-cutout-2)
+                  hotswap-cutout-2
+                  hotswap-cutout-3
+                  hotswap-cutout-4)
   )
 )
 
