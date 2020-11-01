@@ -139,6 +139,7 @@
 
 (def use-hotswap true)
 (def north-facing true)
+(def LED-holder true)
 (def mirror-internals-for-left false) ;false=right hotswap, true=left hotswap TODO derek lazy way to create left and right with correct hot swap holes
 
 (def plate-thickness 5) ;; default 4 to be slightly thicker than case, 5 for hotswap
@@ -151,6 +152,8 @@
 (def holder-x mount-width)
 (def holder-thickness    (/ (- holder-x keyswitch-width) 2))
 (def holder-y            (+ keyswitch-height (* holder-thickness 2)))
+
+(def square-led-size     6)
 
 (def hotswap-holder
   (let [
@@ -165,7 +168,7 @@
         ;
         ; can be be described as having two sizes in the y dimension depending on the x coordinate        
         swap-x              holder-x
-        swap-y              (if (> 11.5 holder-y) holder-y 11.5) ; should be less than or equal to holder-y
+        swap-y              (if (or (> 11.5 holder-y) LED-holder) holder-y 11.5) ; should be less than or equal to holder-y
         swap-offset-x       0
         swap-offset-y       (/ (- holder-y swap-y) 2)
         swap-offset-z       (* (/ swap-z 2) -1) ; the bottom of the hole. 
@@ -183,9 +186,11 @@
         hotswap-cutout-2-x-offset (* (/ holder-x 4.5) -1)
         hotswap-cutout-3-x-offset (- (/ holder-x 2)   (/ hotswap-x3 2))
         hotswap-cutout-4-x-offset (- (/ hotswap-x3 2) (/ holder-x 2))
+        hotswap-cutout-led-x-offset 0
         hotswap-cutout-1-y-offset 4.95
         hotswap-cutout-2-y-offset 4
         hotswap-cutout-3-y-offset (/ holder-y 2)
+        hotswap-cutout-led-y-offset -6
         hotswap-cutout-z-offset -2.6
         hotswap-cutout-1    (->> (cube hotswap-x hotswap-y1 hotswap-z)
                                  (translate [hotswap-cutout-1-x-offset 
@@ -202,6 +207,10 @@
         hotswap-cutout-4    (->> (cube hotswap-x3 hotswap-y1 hotswap-z)
                                  (translate [ hotswap-cutout-4-x-offset
                                               hotswap-cutout-3-y-offset
+                                              hotswap-cutout-z-offset]))
+        hotswap-led-cutout  (->> (cube square-led-size square-led-size 10)
+                                 (translate [ hotswap-cutout-led-x-offset
+                                              hotswap-cutout-led-y-offset
                                               hotswap-cutout-z-offset]))
 
         center-hole      (->> (cylinder (/ 4.1 2) 10)
@@ -226,7 +235,8 @@
                   hotswap-cutout-1
                   hotswap-cutout-2
                   hotswap-cutout-3
-                  hotswap-cutout-4)
+                  hotswap-cutout-4
+                  hotswap-led-cutout)
   )
 )
 
@@ -2691,6 +2701,9 @@
 
   (spit "things/switch-plate.scad"
       (write-scad single-plate))
+
+  (spit "things/hotswap-plate.scad"
+      (write-scad hotswap-holder))
 
   (spit "things/Hactyl-top-left.scad"
         (write-scad dactyl-top-left))
