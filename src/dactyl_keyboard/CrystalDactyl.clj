@@ -38,6 +38,8 @@
 (def switch-type 3)							;;;0= box, 1=cherry, 2= Alps, 3=hotswapbox 
 (def bottom-side-width 1.2) 					;Default 1.2  Originally 1 ;;Width of the bottom sides
 (def top-case-thickness 1.25)					;Default 1.25  Originally 1
+(def top-case-border false)					;show/hide border around top case
+(def top-case-overhang false)					;show/hide border around top case
 (def sidewall-height 10)						;;;;controls height of sidewalls on top.  low profile Defaults 5-lightcycle 	10-dactyl	high profile
 (def top-z-offset 0)						;;;Controls the z/height offset of the case.  Default is 0 higher raises the case (dont forget to compensate the screw mounts)
 (def top-z-offset-thumb 0)					;;Controls thumb offset.  Generally speaking should be the same as the z offset	default 0
@@ -52,7 +54,7 @@
 (def left-right-curve (deg2rad 5))					;;Default is 5 left-right curve of alpha area.  
 (def alphas-column-extra-width 2.0)					;;default 2 the width between each key.
 (def alphas-row-extra-width 0.5)					;;default .5.  width between keys between rows
-(def alpha_ergo_style 0)							;;0 is no ergo 1 is ergodox style--MAKE SURE THIS IS 0 FOR LIGHTCYCLE
+(def alpha_ergo_style 1)							;;0 is no ergo 1 is ergodox style--MAKE SURE THIS IS 0 FOR LIGHTCYCLE
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -137,7 +139,7 @@
 
 (def sa-profile-key-height 12.7) ; TODO-derek reduce to 12? and observe changes to screw hole positions
 
-(def use-hotswap true)
+(def use-hotswap false)
 (def north-facing true)
 (def LED-holder true)
 (def mirror-internals-for-left false) ;false=right hotswap, true=left hotswap TODO derek lazy way to create left and right with correct hot swap holes
@@ -1242,25 +1244,29 @@
    (union
 
     ;; VERTICAL_PART_OF_WALL
+    	(if top-case-border
      (apply union		;;Front left top case wall
             (for [x (range-inclusive 0.7 (- right-wall-column step) step)]
               (hull (place x 4 wall-sphere-top-front)
                     (place (+ x step) 4 wall-sphere-top-front)
                     (place x 4 wall-sphere-bottom-front)
                     (place (+ x step) 4 wall-sphere-bottom-front))))
+     )
+     (if top-case-border
      (apply union
             (for [x (range-inclusive 0.5 0.7 0.01)]
               (hull (place x 4 wall-sphere-top-front)
                     (place (+ x step) 4 wall-sphere-top-front)
                     (place 0.7 4 wall-sphere-bottom-front))))
+     )
 
      ; OVERHANGS_ATTACHED_TO_TOP_OF_WALL
-     ; (top-cover 0.5 1.7 3.6 4)
-     ; (top-cover 1.59 2.41 3.42 4) ;; was 3.32@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-     ; (top-cover 2.39 3.41 3.6 4)
+     (if top-case-overhang (top-cover 0.5 1.7 3.6 4))
+     (if top-case-overhang (top-cover 1.59 2.41 3.42 4)) ;; was 3.32@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+     (if top-case-overhang (top-cover 2.39 3.41 3.6 4))
 
 	 (if (= alpha_ergo_style 1)
-		(top-cover 5.59 6.00 3.0 4))
+		  (if top-case-overhang (top-cover 5.59 6.00 3.0 4)))
      (apply union
             (for [x (range 2 5)]
               (union
@@ -1303,19 +1309,21 @@
    (union
 
     ;; VERTICAL_PART_OF_WALL
+    (if top-case-border
      (apply union
             (for [x (range-inclusive left-wall-column (- right-wall-column step) step)]
               (hull (place x back-y wall-sphere-top-back)
                     (place (+ x step) back-y wall-sphere-top-back)
                     (place x back-y wall-sphere-bottom-back)
                     (place (+ x step) back-y wall-sphere-bottom-back))))
+    )
 
      ; OVERHANGS_ATTACHED_TO_TOP_OF_WALL
-     ; (front-top-cover left-wall-column 1.56 back-y (+ back-y 0.06));;The following 3 control back overhang
-     ; (front-top-cover left-wall-column right-wall-column back-y (+ back-y 0.15)); left 4 columns overhang-- was 2.4  but had issues with alps and lightcycle
-     ;(front-top-cover 1.56 2.44 back-y (+ back-y 0.24));middle finger column
-     ; (front-top-cover 3.56 4.44 back-y (+ back-y 0.32));2nd from right overhand
-     ; (front-top-cover 4.3 right-wall-column back-y (+ back-y 0.32))	;;Edge most column
+     (if top-case-overhang (front-top-cover left-wall-column 1.56 back-y (+ back-y 0.06))) ;;The following 3 control back overhang
+     (if top-case-overhang (front-top-cover left-wall-column right-wall-column back-y (+ back-y 0.15))) ; left 4 columns overhang-- was 2.4  but had issues with alps and lightcycle
+     (if top-case-overhang (front-top-cover 1.56 2.44 back-y (+ back-y 0.24))) ;middle finger column
+     (if top-case-overhang (front-top-cover 3.56 4.44 back-y (+ back-y 0.32))) ;2nd from right overhand
+     (if top-case-overhang (front-top-cover 4.3 right-wall-column back-y (+ back-y 0.32)))	;;Edge most column
 
 
      (hull (place left-wall-column back-y (translate [1 -1 1] wall-sphere-bottom-back))
@@ -1353,6 +1361,7 @@
    (union
 
     ;; VERTICAL_PART_OF_WALL
+    (if top-case-border
      (apply union
             (map (partial apply hull)
                  (partition 2 1
@@ -1360,6 +1369,7 @@
                               (let [x (scale-to-range 4 back-y scale)]
                                 (hull (place right-wall-column x (wall-sphere-top scale))
                                       (place right-wall-column x (wall-sphere-bottom scale))))))))
+    )
 
      (apply union
             (concat
@@ -1390,17 +1400,20 @@
    (union
 
     ;; VERTICAL_PART_OF_WALL
+    (if top-case-border
      (apply union
             (for [x (range-inclusive (dec (first rows)) (- 1.6666 wall-step) wall-step)]
               (hull (place left-wall-column x wall-sphere-top-front)
                     (place left-wall-column (+ x wall-step) wall-sphere-top-front)
                     (place left-wall-column x wall-sphere-bottom-front)
                     (place left-wall-column (+ x wall-step) wall-sphere-bottom-front))))
-
+    )
+    (if top-case-border
      (hull (place left-wall-column (dec (first rows)) wall-sphere-top-front)
            (place left-wall-column (dec (first rows)) wall-sphere-bottom-front)
            (place left-wall-column back-y wall-sphere-top-back)
            (place left-wall-column back-y wall-sphere-bottom-back))
+    )
      (hull (place left-wall-column 0 (translate [1 -1 1] wall-sphere-bottom-back))
            (place left-wall-column 1 (translate [1 0 1] wall-sphere-bottom-back))
            (key-place 0 0 web-post-tl)
@@ -1432,12 +1445,14 @@
    (union
 
     ;; VERTICAL_PART_OF_WALL
+    (if top-case-border
      (apply union
             (for [x (range-inclusive (dec (first rows)) (- 1.6666 wall-step) wall-step)]
               (hull (place left-wall-column x wall-sphere-top-front)
                     (place left-wall-column (+ x wall-step) wall-sphere-top-front)
                     (place left-wall-column x wall-sphere-bottom-front)
                     (place left-wall-column (+ x wall-step) wall-sphere-bottom-front))))
+    )
 
      (hull (place left-wall-column (dec (first rows)) wall-sphere-top-front)
            (place left-wall-column (dec (first rows)) wall-sphere-bottom-front)
@@ -1485,19 +1500,22 @@
    (union
 
     ;; VERTICAL_PART_OF_WALL
+    (if top-case-border
      (apply union
             (for [x (range-inclusive 1/2 (- (+ 5/2 0.05) step) step)]
               (hull (thumb-place x back-y wall-sphere-top-back)
                     (thumb-place (+ x step) back-y wall-sphere-top-back)
                     (thumb-place x back-y wall-sphere-bottom-back)
                     (thumb-place (+ x step) back-y wall-sphere-bottom-back))))
-
+    )
+    (if top-case-border
      (hull (thumb-place 1/2 back-y wall-sphere-top-back)
            (thumb-place 1/2 back-y wall-sphere-bottom-back)
            (case-place left-wall-column 1.6666 wall-sphere-top-front))
      (hull (thumb-place 1/2 back-y wall-sphere-bottom-back)
            (case-place left-wall-column 1.6666 wall-sphere-top-front)
            (case-place left-wall-column 1.6666 wall-sphere-bottom-front))
+    )
      (hull
       (thumb-place 1/2 thumb-back-y (translate [0 -1 1] wall-sphere-bottom-back))
       (thumb-place 1 1 web-post-tr)
@@ -1518,17 +1536,20 @@
    (union
 
     ;; VERTICAL_PART_OF_WALL
+    (if top-case-border
      (apply union
             (for [x (range-inclusive (+ -1 0.07) (- 1.95 step) step)]
               (hull (place thumb-left-wall-column x wall-sphere-top-front)
                     (place thumb-left-wall-column (+ x step) wall-sphere-top-front)
                     (place thumb-left-wall-column x wall-sphere-bottom-front)
                     (place thumb-left-wall-column (+ x step) wall-sphere-bottom-front))))
-
-    (hull (place thumb-left-wall-column 1.95 wall-sphere-top-front)
+    )
+    (if top-case-border
+     (hull (place thumb-left-wall-column 1.95 wall-sphere-top-front)
            (place thumb-left-wall-column 1.95 wall-sphere-bottom-front)
            (place thumb-left-wall-column thumb-back-y wall-sphere-top-back)
            (place thumb-left-wall-column thumb-back-y wall-sphere-bottom-back))
+    )
 
      (hull
       (thumb-place thumb-left-wall-column thumb-back-y (translate [1 -1 1] wall-sphere-bottom-back))
@@ -1573,13 +1594,15 @@
    (union
 
     ;; VERTICAL_PART_OF_WALL
-    (apply union
+    (if top-case-border
+     (apply union
             (for [x (range-inclusive thumb-right-wall (- (+ 5/2 0.05) step) step)]
               (hull (place x thumb-front-row wall-sphere-top-front)
                     (place (+ x step) thumb-front-row wall-sphere-top-front)
                     (place x thumb-front-row wall-sphere-bottom-front)
                     (place (+ x step) thumb-front-row wall-sphere-bottom-front))))
-
+    )
+   (if top-case-border
     (if ( > left-right-thumb-tilt -30)(->> 
      (hull (place thumb-right-wall thumb-front-row wall-sphere-top-front)
            (place thumb-right-wall thumb-front-row wall-sphere-bottom-front)
@@ -1587,6 +1610,7 @@
     (hull (place thumb-right-wall thumb-front-row wall-sphere-bottom-front)
            (case-place 0.5 4 wall-sphere-top-front)
            (case-place 0.7 4 wall-sphere-bottom-front))))
+   )
 
      (hull (place thumb-right-wall thumb-front-row wall-sphere-bottom-front)
            (key-place 1 4 web-post-bl)
