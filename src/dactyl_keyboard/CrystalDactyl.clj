@@ -54,7 +54,7 @@
 (def left-right-curve (deg2rad 5))					;;Default is 5 left-right curve of alpha area.  
 (def alphas-column-extra-width 2.0)					;;default 2 the width between each key.
 (def alphas-row-extra-width 0.5)					;;default .5.  width between keys between rows
-(def alpha_ergo_style 1)							;;0 is no ergo 1 is ergodox style--MAKE SURE THIS IS 0 FOR LIGHTCYCLE
+(def alpha_ergo_style 0)							;;0 is no ergo 1 is ergodox style--MAKE SURE THIS IS 0 FOR LIGHTCYCLE
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@
