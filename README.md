@@ -1,5 +1,6 @@
-# Revised Version of Crystalhand's Dactyl (Hactyl)
-This is my version of the Dactyl with a number of modifications and additions.  I changed a number of constants to variables to make it easier to modify.
+# Forked Version of Dactyl (Hactyl)
+
+This is a fork of the [crystalhand fork](https://github.com/crystalhand/dactyl-keyboard) of the [Dactyl](https://github.com/adereth/dactyl-keyboard), a parameterized, split-hand, concave, columnar, ergonomic keyboard.
 
 ## Customization for Hactyl (Derek changes)
 - Hotswap holder i designed (hotglue recommended)
@@ -43,6 +44,7 @@ This is my version of the Dactyl with a number of modifications and additions.  
 * Wait for STL files to appear (this may take a minute or two) 
 
 # Customization for dactyl (Crystalhand)
+This is my version of the Dactyl with a number of modifications and additions.  I changed a number of constants to variables to make it easier to modify.
 - Ergodox like layout for a wider range of supported keys
 - Curve/slope front back and left/right for alphas and thumb controlled separately
 - Thumb cluster layout
