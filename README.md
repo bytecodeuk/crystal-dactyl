@@ -17,6 +17,9 @@ This is my version of the Dactyl with a number of modifications and additions.  
 ## Timelapse Video
 [![Dactyl Timelapse Video](/resources/timelapse-screenshot.png)](https://youtu.be/jucJIm_TujM)
 
+## Hactyl With Per-key RGB
+![Hactyl Glamourshot](/resources/hactyl_glamourshot.jpeg)
+
 # Generate OpenSCAD and STL models
 
 ## OLD
