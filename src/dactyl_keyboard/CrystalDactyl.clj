@@ -154,7 +154,9 @@
 
 (def sa-profile-key-height 12.7) ; TODO-derek reduce to 12? and observe changes to screw hole positions
 
-(def use-hotswap false)
+;(def use-hotswap false)  ADS 15/08/21
+(def use-hotswap true)
+
 (def north-facing true)
 (def LED-holder true)
 (def mirror-internals-for-left false) ;false=right hotswap, true=left hotswap TODO derek lazy way to create left and right with correct hot swap holes
@@ -2624,6 +2626,28 @@
 	))
 )
 
+;; (defn key-position [column row position]
+;;   (apply-key-geometry (partial map +) rotate-around-x rotate-around-y column row position))
+
+;; (def rj9-start  (map + [0 -4  0] (key-position 0 0 (map + (wall-locate3 0 1) [0 (/ mount-height  2) 0]))))
+;; (def rj9-position  [(first rj9-start) (second rj9-start) 11])
+;; (def rj9-cube   (cube 14.1 8 22.38))
+;; (def rj9-space  (translate rj9-position rj9-cube))
+;; (def rj9-holder (translate rj9-position
+;;                   (difference rj9-cube
+;;                     (cube 10.1 8 18)
+;;                                      )))
+
+;; (def usb-holder-position (key-position 1 0.085 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
+;; (def usb-holder-size [6.5 8.0 13.6])
+;; (def usb-holder-thickness 4)
+;; (def usb-holder
+;;     (->> (cube (+ (first usb-holder-size) usb-holder-thickness) (second usb-holder-size) (+ (last usb-holder-size) usb-holder-thickness))
+;;          (translate [(first usb-holder-position) (second usb-holder-position) (/ (+ (last usb-holder-size) usb-holder-thickness) 2)])))
+;; (def usb-holder-hole
+;;     (->> (apply cube usb-holder-size)
+;;          (translate [(first usb-holder-position) (second usb-holder-position) (/ (+ (last usb-holder-size) usb-holder-thickness) 2)])))
+
 (def bottom-case
 	(scale[(- scale-bottom 0.0), scale-bottom, scale-bottom] 
 	   (difference
@@ -2639,6 +2663,8 @@
 							;;screw-mount 
 							trimmed_square_screw_mounts
 							)
+              ;; rj9-space 
+              ;; usb-holder-hole
 							plate-cutout1			
 					)											
 				)	
